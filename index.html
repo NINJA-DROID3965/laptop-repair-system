@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laptop Repair Record System</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js">
+    </script>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --surface: #16213e;
+            --card: #0f3460;
+            --accent: #e94560;
+            --text: #eee;
+            --text-secondary: #aaa;
+            --border: #2a2a4a;
+            --success: #00c853;
+            --warning: #ffab00;
+            --danger: #ff1744;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--surface);
+            border-bottom: 2px solid var(--accent);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header .title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        .header .stats {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .header .stats span {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .form-card h2 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(233, 68, 96, 0.15);
+        }
+
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aaa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .btn-add {
+            background: var(--accent);
+            color: white;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .btn-add:hover {
+            background: #ff5a7a;
+            box-shadow: 0 4px 15px rgba(233, 68, 96, 0.4);
+        }
+
+        .btn-update {
+            background: #ffab00;
+            color: #000;
+        }
+
+        .btn-cancel {
+            background: #555;
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+
+        .table-card h2 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .toolbar input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .toolbar input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .toolbar select {
+            padding: 0.6rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .btn-export {
+            background: #00c853;
+            color: #000;
+            font-weight: 700;
+        }
+
+        .btn-export:hover {
+            background: #00e676;
+            box-shadow: 0 4px 15px rgba(0, 200, 83, 0.4);
+        }
+
+        .btn-print {
+            background: #2979ff;
+            color: white;
+            font-weight: 700;
+        }
+
+        .btn-print:hover {
+            background: #448aff;
+            box-shadow: 0 4px 15px rgba(41, 121, 255, 0.4);
+        }
+
+        .btn-delete-all {
+            background: #ff1744;
+            color: white;
+            font-weight: 700;
+        }
+
+        .btn-delete-all:hover {
+            background: #ff5252;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 55vh;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 900px;
+        }
+
+        table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        table thead th {
+            background: var(--card);
+            color: var(--accent);
+            padding: 0.8rem 0.6rem;
+            text-align: left;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+            border-bottom: 2px solid var(--accent);
+            white-space: nowrap;
+        }
+
+        table tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        table tbody tr:hover {
+            background: rgba(233, 68, 96, 0.05);
+        }
+
+        table tbody td {
+            padding: 0.65rem 0.6rem;
+            vertical-align: middle;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-pending {
+            background: #ffab00;
+            color: #000;
+        }
+        .badge-ongoing {
+            background: #2979ff;
+            color: white;
+        }
+        .badge-completed {
+            background: #00c853;
+            color: #000;
+        }
+        .badge-cancelled {
+            background: #ff1744;
+            color: white;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.7rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #ffab00;
+            color: #000;
+        }
+        .btn-delete {
+            background: #ff1744;
+            color: white;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .modal .btn-group {
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #00c853;
+            color: #000;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            z-index: 2000;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.5s forwards;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .header,
+            .form-card,
+            .toolbar,
+            .action-btns,
+            .btn,
+            .modal-overlay,
+            .toast {
+                display: none !important;
+            }
+            .container {
+                display: block;
+                max-width: 100%;
+                padding: 0;
+            }
+            .table-card {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                background: white;
+            }
+            .table-wrapper {
+                max-height: none;
+                overflow: visible;
+                border: none;
+            }
+            table thead th {
+                background: #ddd;
+                color: black;
+                border-bottom: 2px solid black;
+            }
+            table tbody tr {
+                border-bottom: 1px solid #ccc;
+            }
+            table tbody td {
+                color: black;
+            }
+            .badge {
+                border: 1px solid black;
+                color: black !important;
+                background: #eee !important;
+            }
+            @page {
+                margin: 1cm;
+                size: landscape;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="title">💻 LAPTOP REPAIR RECORD SYSTEM</div>
+        <div class="stats">
+            Total Records: <span id="totalRecords">0</span>
+            | Completed: <span id="completedCount">0</span>
+            | Pending: <span id="pendingCount">0</span>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="form-card" id="formCard">
+            <h2 id="formTitle">➕ NEW RECORD</h2>
+            <form id="recordForm" autocomplete="off">
+                <input type="hidden" id="recordId" value="">
+                <input type="hidden" id="recordDate" value="">
+
+                <div class="form-group">
+                    <label>Laptop Brand *</label>
+                    <select id="laptopBrand" required>
+                        <option value="">-- Select Brand --</option>
+                        <option value="Dell">Dell</option>
+                        <option value="HP">HP</option>
+                        <option value="Lenovo">Lenovo</option>
+                        <option value="Asus">Asus</option>
+                        <option value="Acer">Acer</option>
+                        <option value="Apple">Apple (MacBook)</option>
+                        <option value="MSI">MSI</option>
+                        <option value="Razer">Razer</option>
+                        <option value="Samsung">Samsung</option>
+                        <option value="Toshiba">Toshiba</option>
+                        <option value="Fujitsu">Fujitsu</option>
+                        <option value="Huawei">Huawei</option>
+                        <option value="Xiaomi">Xiaomi</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Laptop Model *</label>
+                    <input type="text" id="laptopModel" placeholder="e.g., Latitude 5520, ThinkPad T14" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Serial Number</label>
+                    <input type="text" id="serialNumber" placeholder="e.g., ABC123XYZ">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>RAM Used *</label>
+                        <select id="ramUsed" required>
+                            <option value="">-- Select --</option>
+                            <option value="2GB DDR3">2GB DDR3</option>
+                            <option value="4GB DDR3">4GB DDR3</option>
+                            <option value="8GB DDR3">8GB DDR3</option>
+                            <option value="2GB DDR4">2GB DDR4</option>
+                            <option value="4GB DDR4">4GB DDR4</option>
+                            <option value="8GB DDR4">8GB DDR4</option>
+                            <option value="16GB DDR4">16GB DDR4</option>
+                            <option value="32GB DDR4">32GB DDR4</option>
+                            <option value="8GB DDR5">8GB DDR5</option>
+                            <option value="16GB DDR5">16GB DDR5</option>
+                            <option value="32GB DDR5">32GB DDR5</option>
+                            <option value="64GB DDR5">64GB DDR5</option>
+                            <option value="Other">Other / Custom</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>RAM Type (if Other)</label>
+                        <input type="text" id="ramCustom" placeholder="Specify custom RAM">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Storage Used</label>
+                        <select id="storageUsed">
+                            <option value="">-- Select --</option>
+                            <option value="None">None / Original</option>
+                            <option value="128GB SSD">128GB SSD</option>
+                            <option value="256GB SSD">256GB SSD</option>
+                            <option value="512GB SSD">512GB SSD</option>
+                            <option value="1TB SSD">1TB SSD</option>
+                            <option value="2TB SSD">2TB SSD</option>
+                            <option value="500GB HDD">500GB HDD</option>
+                            <option value="1TB HDD">1TB HDD</option>
+                            <option value="2TB HDD">2TB HDD</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select id="status" required>
+                            <option value="Pending">Pending</option>
+                            <option value="Ongoing">Ongoing</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Action Performed / Repair Description *</label>
+                    <textarea id="actionPerformed" placeholder="Describe what was done: RAM upgrade, screen replacement, keyboard repair, cleaning, OS reinstall, etc." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Technician Name</label>
+                    <input type="text" id="technician" placeholder="e.g., Juan Dela Cruz">
+                </div>
+
+                <div class="form-group">
+                    <label>Notes / Observations</label>
+                    <textarea id="notes" placeholder="Additional notes..."></textarea>
+                </div>
+
+                <div class="btn-group" id="formBtnGroup">
+                    <button type="submit" class="btn btn-add" id="btnSubmit">✅ ADD RECORD</button>
+                </div>
+                <div class="btn-group" id="editBtnGroup" style="display:none;">
+                    <button type="button" class="btn btn-update" id="btnUpdate">💾 UPDATE RECORD</button>
+                    <button type="button" class="btn btn-cancel" id="btnCancel">❌ CANCEL</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-card">
+            <h2>
+                📋 RECORDS LIST
+                <div class="toolbar">
+                    <input type="text" id="searchInput" placeholder="🔍 Search by brand, model, serial, action...">
+                    <select id="filterStatus">
+                        <option value="All">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Ongoing">Ongoing</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                    <select id="filterBrand">
+                        <option value="All">All Brands</option>
+                    </select>
+                    <button class="btn btn-export btn-sm" onclick="exportToExcel()">📥 EXCEL</button>
+                    <button class="btn btn-print btn-sm" onclick="printRecords()">🖨️ PRINT</button>
+                    <button class="btn btn-delete-all btn-sm" onclick="confirmDeleteAll()">🗑️ CLEAR ALL</button>
+                </div>
+            </h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Brand</th>
+                            <th>Model</th>
+                            <th>Serial #</th>
+                            <th>RAM Used</th>
+                            <th>Storage</th>
+                            <th>Action Performed</th>
+                            <th>Technician</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr class="no-data">
+                            <td colspan="11">No records found. Add a new record using the form.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <h3>⚠️ CONFIRM DELETE</h3>
+            <p>Are you sure you want to delete this record? This action cannot be undone.</p>
+            <div class="btn-group">
+                <button class="btn btn-delete-all" id="btnConfirmDelete">🗑️ DELETE</button>
+                <button class="btn btn-cancel" onclick="closeModal()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="deleteAllModal">
+        <div class="modal">
+            <h3>⚠️ DELETE ALL RECORDS</h3>
+            <p>Are you sure you want to delete <strong>ALL</strong> records? This cannot be undone.</p>
+            <div class="btn-group">
+                <button class="btn btn-delete-all" id="btnConfirmDeleteAll">🗑️ DELETE ALL</button>
+                <button class="btn btn-cancel" onclick="closeDeleteAllModal()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'laptopRepairRecords';
+        let records = [];
+        let editingId = null;
+        let deleteTargetId = null;
+
+        function init() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    records = JSON.parse(stored);
+                } catch (e) {
+                    records = [];
+                }
+            }
+            populateBrandFilter();
+            renderTable();
+            updateStats();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        }
+
+        function generateId() {
+            return 'REC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+        }
+
+        function getCurrentDate() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+        }
+
+        document.getElementById('recordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const ramSelected = document.getElementById('ramUsed').value;
+            const ramCustom = document.getElementById('ramCustom').value.trim();
+            const finalRam = ramSelected === 'Other' ? ramCustom : ramSelected;
+
+            const record = {
+                id: generateId(),
+                date: getCurrentDate(),
+                brand: document.getElementById('laptopBrand').value,
+                model: document.getElementById('laptopModel').value.trim(),
+                serial: document.getElementById('serialNumber').value.trim(),
+                ram: finalRam,
+                storage: document.getElementById('storageUsed').value || 'None',
+                action: document.getElementById('actionPerformed').value.trim(),
+                technician: document.getElementById('technician').value.trim(),
+                status: document.getElementById('status').value,
+                notes: document.getElementById('notes').value.trim()
+            };
+
+            records.unshift(record);
+            saveToStorage();
+            resetForm();
+            renderTable();
+            updateStats();
+            showToast('✅ Record added successfully!');
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filterStatus = document.getElementById('filterStatus').value;
+            const filterBrand = document.getElementById('filterBrand').value;
+
+            let filtered = records.filter(r => {
+                const matchSearch = !searchTerm ||
+                    r.brand.toLowerCase().includes(searchTerm) ||
+                    r.model.toLowerCase().includes(searchTerm) ||
+                    r.serial.toLowerCase().includes(searchTerm) ||
+                    r.action.toLowerCase().includes(searchTerm) ||
+                    r.technician.toLowerCase().includes(searchTerm) ||
+                    r.ram.toLowerCase().includes(searchTerm) ||
+                    r.notes.toLowerCase().includes(searchTerm);
+                const matchStatus = filterStatus === 'All' || r.status === filterStatus;
+                const matchBrand = filterBrand === 'All' || r.brand === filterBrand;
+                return matchSearch && matchStatus && matchBrand;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr class="no-data"><td colspan="11">No records found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r => {
+                const statusClass = `badge-${r.status.toLowerCase()}`;
+                return `
+                    <tr>
+                        <td>${escapeHtml(r.date)}</td>
+                        <td><strong>${escapeHtml(r.brand)}</strong></td>
+                        <td>${escapeHtml(r.model)}</td>
+                        <td>${escapeHtml(r.serial) || '-'}</td>
+                        <td>${escapeHtml(r.ram)}</td>
+                        <td>${escapeHtml(r.storage)}</td>
+                        <td>${escapeHtml(r.action)}</td>
+                        <td>${escapeHtml(r.technician) || '-'}</td>
+                        <td><span class="badge ${statusClass}">${r.status}</span></td>
+                        <td>${escapeHtml(r.notes) || '-'}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-sm btn-edit" onclick="editRecord('${r.id}')" title="Edit">✏️</button>
+                                <button class="btn-sm btn-delete" onclick="confirmDelete('${r.id}')" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function editRecord(id) {
+            const record = records.find(r => r.id === id);
+            if (!record) return;
+
+            editingId = id;
+            document.getElementById('recordId').value = id;
+            document.getElementById('laptopBrand').value = record.brand;
+            document.getElementById('laptopModel').value = record.model;
+            document.getElementById('serialNumber').value = record.serial;
+            document.getElementById('actionPerformed').value = record.action;
+            document.getElementById('technician').value = record.technician;
+            document.getElementById('status').value = record.status;
+            document.getElementById('notes').value = record.notes;
+            document.getElementById('storageUsed').value = record.storage;
+
+            const commonRams = ['2GB DDR3', '4GB DDR3', '8GB DDR3', '2GB DDR4', '4GB DDR4', '8GB DDR4', '16GB DDR4',
+                '32GB DDR4', '8GB DDR5', '16GB DDR5', '32GB DDR5', '64GB DDR5'
+            ];
+            if (commonRams.includes(record.ram)) {
+                document.getElementById('ramUsed').value = record.ram;
+                document.getElementById('ramCustom').value = '';
+            } else {
+                document.getElementById('ramUsed').value = 'Other';
+                document.getElementById('ramCustom').value = record.ram;
+            }
+
+            document.getElementById('formTitle').textContent = '✏️ EDIT RECORD';
+            document.getElementById('btnSubmit').style.display = 'none';
+            document.getElementById('editBtnGroup').style.display = 'flex';
+            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.getElementById('btnUpdate').addEventListener('click', function() {
+            if (!editingId) return;
+
+            const record = records.find(r => r.id === editingId);
+            if (!record) return;
+
+            const ramSelected = document.getElementById('ramUsed').value;
+            const ramCustom = document.getElementById('ramCustom').value.trim();
+            const finalRam = ramSelected === 'Other' ? ramCustom : ramSelected;
+
+            record.brand = document.getElementById('laptopBrand').value;
+            record.model = document.getElementById('laptopModel').value.trim();
+            record.serial = document.getElementById('serialNumber').value.trim();
+            record.ram = finalRam;
+            record.storage = document.getElementById('storageUsed').value || 'None';
+            record.action = document.getElementById('actionPerformed').value.trim();
+            record.technician = document.getElementById('technician').value.trim();
+            record.status = document.getElementById('status').value;
+            record.notes = document.getElementById('notes').value.trim();
+
+            saveToStorage();
+            resetForm();
+            renderTable();
+            updateStats();
+            showToast('✅ Record updated successfully!');
+        });
+
+        document.getElementById('btnCancel').addEventListener('click', resetForm);
+
+        function resetForm() {
+            editingId = null;
+            document.getElementById('recordId').value = '';
+            document.getElementById('recordForm').reset();
+            document.getElementById('ramCustom').value = '';
+            document.getElementById('formTitle').textContent = '➕ NEW RECORD';
+            document.getElementById('btnSubmit').style.display = 'block';
+            document.getElementById('editBtnGroup').style.display = 'none';
+        }
+
+        function confirmDelete(id) {
+            deleteTargetId = id;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        document.getElementById('btnConfirmDelete').addEventListener('click', function() {
+            if (deleteTargetId) {
+                records = records.filter(r => r.id !== deleteTargetId);
+                saveToStorage();
+                resetForm();
+                renderTable();
+                updateStats();
+                showToast('🗑️ Record deleted.');
+                deleteTargetId = null;
+            }
+            closeModal();
+        });
+
+        function closeModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteTargetId = null;
+        }
+
+        function confirmDeleteAll() {
+            if (records.length === 0) {
+                showToast('⚠️ No records to delete.');
+                return;
+            }
+            document.getElementById('deleteAllModal').classList.add('active');
+        }
+
+        document.getElementById('btnConfirmDeleteAll').addEventListener('click', function() {
+            records = [];
+            saveToStorage();
+            resetForm();
+            renderTable();
+            updateStats();
+            showToast('🗑️ All records deleted.');
+            closeDeleteAllModal();
+        });
+
+        function closeDeleteAllModal() {
+            document.getElementById('deleteAllModal').classList.remove('active');
+        }
+
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        document.getElementById('deleteAllModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDeleteAllModal();
+        });
+
+        document.getElementById('searchInput').addEventListener('input', renderTable);
+        document.getElementById('filterStatus').addEventListener('change', renderTable);
+        document.getElementById('filterBrand').addEventListener('change', renderTable);
+
+        function populateBrandFilter() {
+            const filterBrand = document.getElementById('filterBrand');
+            const brands = [...new Set(records.map(r => r.brand))].sort();
+            filterBrand.innerHTML = '<option value="All">All Brands</option>';
+            brands.forEach(b => {
+                filterBrand.innerHTML += `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`;
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('totalRecords').textContent = records.length;
+            document.getElementById('completedCount').textContent = records.filter(r => r.status === 'Completed').length;
+            document.getElementById('pendingCount').textContent = records.filter(r => r.status === 'Pending').length;
+            populateBrandFilter();
+        }
+
+        function exportToExcel() {
+            if (records.length === 0) {
+                showToast('⚠️ No records to export.');
+                return;
+            }
+
+            const data = records.map(r => ({
+                'Date': r.date,
+                'Brand': r.brand,
+                'Model': r.model,
+                'Serial Number': r.serial || '-',
+                'RAM Used': r.ram,
+                'Storage Used': r.storage || 'None',
+                'Action Performed': r.action,
+                'Technician': r.technician || '-',
+                'Status': r.status,
+                'Notes': r.notes || '-'
+            }));
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(data);
+
+            const colWidths = [
+                { wch: 18 },
+                { wch: 12 },
+                { wch: 20 },
+                { wch: 18 },
+                { wch: 14 },
+                { wch: 14 },
+                { wch: 40 },
+                { wch: 18 },
+                { wch: 12 },
+                { wch: 25 }
+            ];
+            ws['!cols'] = colWidths;
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Laptop Repair Records');
+
+            const dateStr = new Date().toISOString().slice(0, 10);
+            const filename = `Laptop_Repair_Records_${dateStr}.xlsx`;
+
+            XLSX.writeFile(wb, filename);
+            showToast('📥 Excel file exported: ' + filename);
+        }
+
+        function printRecords() {
+            if (records.length === 0) {
+                showToast('⚠️ No records to print.');
+                return;
+            }
+            window.print();
+        }
+
+        function showToast(message) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 3000);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                document.getElementById('recordForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        init();
+    </script>
+
+</body>
+</html>
