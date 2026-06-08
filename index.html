@@ -3,21 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laptop Repair Record System</title>
+    <title>Shane Creation — RepairLog</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js">
     </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            --bg: #1a1a2e;
-            --surface: #16213e;
-            --card: #0f3460;
-            --accent: #e94560;
-            --text: #eee;
-            --text-secondary: #aaa;
-            --border: #2a2a4a;
-            --success: #00c853;
-            --warning: #ffab00;
-            --danger: #ff1744;
+            --bg-deep: #030308;
+            --bg-void: #06060f;
+            --bg-elevated: #0a0a1a;
+            --bg-surface: #0f0f24;
+            --glass-1: rgba(15, 15, 36, 0.55);
+            --glass-2: rgba(20, 20, 50, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.04);
+            --glass-border-hover: rgba(255, 255, 255, 0.1);
+            --accent-1: #00d4ff;
+            --accent-2: #7b2fff;
+            --accent-3: #ff2d95;
+            --accent-gold: #ffb800;
+            --accent-emerald: #00ff88;
+            --glow-cyan: rgba(0, 212, 255, 0.5);
+            --glow-purple: rgba(123, 47, 255, 0.5);
+            --glow-pink: rgba(255, 45, 149, 0.5);
+            --glow-gold: rgba(255, 184, 0, 0.5);
+            --glow-emerald: rgba(0, 255, 136, 0.5);
+            --text-main: #e8e8f0;
+            --text-dim: #9090a8;
+            --text-faint: #5c5c78;
+            --radius-xs: 6px;
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 22px;
+            --radius-xl: 28px;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-spring: cubic-bezier(0.22, 1.2, 0.36, 1);
         }
 
         * {
@@ -26,644 +47,1117 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
+        html {
+            scroll-behavior: smooth;
         }
 
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* ============ COSMIC BACKGROUND ============ */
+        .cosmic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 10% 0%, rgba(0, 212, 255, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 90% 100%, rgba(123, 47, 255, 0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 45, 149, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 30% 70%, rgba(0, 255, 136, 0.03) 0%, transparent 60%);
+        }
+
+        /* Animated grid lines */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.03;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridShift 20s linear infinite;
+        }
+
+        @keyframes gridShift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+            animation: orbFloat 12s ease-in-out infinite;
+        }
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-1);
+            opacity: 0.05;
+            top: -200px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-2);
+            opacity: 0.05;
+            bottom: -150px;
+            right: -100px;
+            animation-delay: -6s;
+        }
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-3);
+            opacity: 0.04;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -3s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(60px, -40px) scale(1.15); }
+            50% { transform: translate(-30px, 50px) scale(0.9); }
+            75% { transform: translate(-50px, -30px) scale(1.1); }
+        }
+
+        /* ============ HEADER ============ */
         .header {
-            background: var(--surface);
-            border-bottom: 2px solid var(--accent);
-            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--glass-1);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0.75rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
         }
 
-        .header .title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--accent);
-            letter-spacing: 1px;
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg,
+                    transparent, var(--accent-1), var(--accent-2),
+                    var(--accent-3), var(--accent-2), var(--accent-1), transparent);
+            opacity: 0.6;
         }
 
-        .header .stats {
+        .brand {
             display: flex;
-            gap: 1.5rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+            align-items: center;
+            gap: 0.8rem;
         }
 
-        .header .stats span {
-            color: var(--accent);
-            font-weight: bold;
+        .brand-logo {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #0a0a1a, #1a1a3a);
+            border-radius: var(--radius-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        .brand-logo::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: var(--radius-xs);
+            background: conic-gradient(from 0deg,
+                    var(--accent-1), var(--accent-2), var(--accent-3),
+                    var(--accent-gold), var(--accent-emerald), var(--accent-1));
+            animation: logoSpin 4s linear infinite;
+            opacity: 0.8;
+            z-index: -1;
+        }
+
+        @keyframes logoSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .brand-logo-inner {
+            width: 36px;
+            height: 36px;
+            background: #0a0a1a;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-family: 'Orbitron', monospace;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #e0e0f0, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-sub {
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-faint);
+            font-weight: 600;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .stat-pill {
+            background: var(--glass-2);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 0.5rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.4s var(--ease-out-expo);
+            cursor: default;
+        }
+
+        .stat-pill:hover {
+            border-color: var(--glass-border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .stat-pill-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .dot-total { background: var(--accent-1); box-shadow: 0 0 12px var(--glow-cyan); }
+        .dot-done { background: var(--accent-emerald); box-shadow: 0 0 12px var(--glow-emerald); }
+        .dot-active { background: var(--accent-gold); box-shadow: 0 0 12px var(--glow-gold); animation: dotPulse 1.5s ease-in-out infinite; }
+
+        @keyframes dotPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.8); }
+        }
+
+        .stat-pill-value {
+            font-family: 'JetBrains Mono', 'Orbitron', monospace;
+            font-weight: 700;
             font-size: 1.2rem;
+            line-height: 1;
+        }
+        .stat-pill-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-faint);
+            font-weight: 600;
         }
 
+        /* ============ MAIN LAYOUT ============ */
         .container {
-            max-width: 1400px;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 1.5rem;
             display: grid;
-            grid-template-columns: 400px 1fr;
+            grid-template-columns: 430px 1fr;
             gap: 1.5rem;
+            position: relative;
+            z-index: 1;
         }
 
-        @media (max-width: 900px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 1050px) {
+            .container { grid-template-columns: 1fr; }
+            .header-stats { gap: 0.4rem; }
+            .stat-pill { padding: 0.4rem 0.8rem; }
+            .stat-pill-value { font-size: 1rem; }
+            .stat-pill-label { font-size: 0.5rem; }
+            .brand-name { font-size: 0.9rem; }
         }
 
+        /* ============ FORM CARD ============ */
         .form-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
+            background: var(--glass-2);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 1.8rem;
             height: fit-content;
             position: sticky;
             top: 100px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            transition: all 0.5s var(--ease-out-expo);
         }
 
-        .form-card h2 {
-            color: var(--accent);
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+
+        .form-card:hover {
+            border-color: var(--glass-border-hover);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(123,47,255,0.08);
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
             margin-bottom: 1.5rem;
-            font-size: 1.2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .form-icon-hex {
+            width: 38px;
+            height: 38px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+        .hex-add { background: rgba(0,212,255,0.2); color: var(--accent-1); }
+        .hex-edit { background: rgba(255,184,0,0.2); color: var(--accent-gold); }
+
+        .form-header h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
+            color: var(--text-dim);
+        }
+
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-1);
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            opacity: 0.8;
         }
 
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 0.9rem;
+            position: relative;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.4rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            font-size: 0.72rem;
+            letter-spacing: 0.3px;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 0.7rem 1rem;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 0.95rem;
-            transition: border-color 0.3s;
+            padding: 0.65rem 0.9rem;
+            background: rgba(10,10,26,0.8);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius-sm);
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--text-faint);
+            font-weight: 300;
         }
 
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(233, 68, 96, 0.15);
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 4px rgba(0,212,255,0.06), 0 0 20px rgba(0,212,255,0.04);
+            background: rgba(15,15,36,0.9);
         }
 
         .form-group textarea {
-            height: 80px;
+            height: 70px;
             resize: vertical;
-            font-family: inherit;
+            min-height: 60px;
+            max-height: 180px;
         }
 
         .form-group select {
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aaa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235c5c78' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 1rem center;
+            background-position: right 0.7rem center;
+            padding-right: 2.2rem;
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 0.7rem;
         }
 
+        @media (max-width: 500px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        /* ============ BUTTONS ============ */
         .btn {
-            padding: 0.75rem 1.5rem;
+            padding: 0.7rem 1.5rem;
             border: none;
-            border-radius: 6px;
-            font-weight: 700;
+            border-radius: 50px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: all 0.3s;
+            transition: all 0.4s var(--ease-out-back);
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn-add {
-            background: var(--accent);
-            color: white;
-            width: 100%;
-            margin-top: 0.5rem;
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50px;
+            opacity: 0;
+            transition: opacity 0.4s;
         }
 
-        .btn-add:hover {
-            background: #ff5a7a;
-            box-shadow: 0 4px 15px rgba(233, 68, 96, 0.4);
+        .btn:hover::before {
+            opacity: 1;
         }
 
-        .btn-update {
-            background: #ffab00;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-1), #0099cc);
             color: #000;
+            width: 100%;
+            margin-top: 0.4rem;
+            font-weight: 700;
+            box-shadow: 0 6px 25px rgba(0,212,255,0.25);
+            letter-spacing: 1.5px;
+        }
+        .btn-primary::before {
+            background: linear-gradient(135deg, #33ddff, #00b8e6);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,212,255,0.4);
         }
 
-        .btn-cancel {
-            background: #555;
-            color: white;
+        .btn-gold {
+            background: linear-gradient(135deg, var(--accent-gold), #ff9d00);
+            color: #000;
+            font-weight: 700;
+        }
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--glow-gold);
+        }
+
+        .btn-ghost {
+            background: rgba(255,255,255,0.03);
+            color: var(--text-dim);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--text-main);
+            border-color: rgba(255,255,255,0.15);
         }
 
         .btn-group {
             display: flex;
             gap: 0.5rem;
-            margin-top: 0.5rem;
+            margin-top: 0.4rem;
         }
 
+        /* ============ TABLE CARD ============ */
         .table-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            background: var(--glass-2);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
             padding: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
             overflow: hidden;
         }
 
-        .table-card h2 {
-            color: var(--accent);
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
+        .table-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            pointer-events: none;
+        }
+
+        .table-top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
         }
 
+        .table-top-bar h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ============ TOOLBAR ============ */
         .toolbar {
             display: flex;
-            gap: 0.8rem;
-            margin-bottom: 1rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
             align-items: center;
         }
 
-        .toolbar input[type="text"] {
+        .search-wrap {
+            position: relative;
             flex: 1;
-            min-width: 200px;
-            padding: 0.6rem 1rem;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 0.9rem;
+            min-width: 180px;
         }
 
-        .toolbar input[type="text"]:focus {
+        .search-wrap input {
+            width: 100%;
+            padding: 0.55rem 1rem 0.55rem 2.4rem;
+            background: rgba(10,10,26,0.8);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 50px;
+            color: var(--text-main);
+            font-size: 0.8rem;
+            transition: all 0.3s var(--ease-out-expo);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-wrap input:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px rgba(0,212,255,0.06);
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-faint);
+            font-size: 0.75rem;
         }
 
         .toolbar select {
-            padding: 0.6rem 1rem;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 0.9rem;
+            padding: 0.55rem 2rem 0.55rem 0.8rem;
+            background: rgba(10,10,26,0.8);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 50px;
+            color: var(--text-main);
+            font-size: 0.78rem;
             cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235c5c78' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.6rem center;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s var(--ease-out-expo);
         }
 
-        .btn-export {
-            background: #00c853;
-            color: #000;
-            font-weight: 700;
+        .toolbar select:focus {
+            outline: none;
+            border-color: var(--accent-1);
         }
 
-        .btn-export:hover {
-            background: #00e676;
-            box-shadow: 0 4px 15px rgba(0, 200, 83, 0.4);
+        .btn-tool {
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.72rem;
+            letter-spacing: 0.5px;
+            transition: all 0.4s var(--ease-out-back);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            background: transparent;
+        }
+
+        .btn-excel {
+            color: var(--accent-emerald);
+            border-color: rgba(0,255,136,0.25);
+            background: rgba(0,255,136,0.05);
+        }
+        .btn-excel:hover {
+            background: rgba(0,255,136,0.15);
+            box-shadow: 0 4px 20px var(--glow-emerald);
+            transform: translateY(-2px);
         }
 
         .btn-print {
-            background: #2979ff;
-            color: white;
-            font-weight: 700;
+            color: #74b9ff;
+            border-color: rgba(116,185,255,0.25);
+            background: rgba(116,185,255,0.05);
         }
-
         .btn-print:hover {
-            background: #448aff;
-            box-shadow: 0 4px 15px rgba(41, 121, 255, 0.4);
+            background: rgba(116,185,255,0.15);
+            box-shadow: 0 4px 20px rgba(116,185,255,0.3);
+            transform: translateY(-2px);
         }
 
-        .btn-delete-all {
-            background: #ff1744;
-            color: white;
-            font-weight: 700;
+        .btn-danger {
+            color: #ff6b81;
+            border-color: rgba(255,107,129,0.2);
+            background: rgba(255,107,129,0.04);
+        }
+        .btn-danger:hover {
+            background: rgba(255,107,129,0.15);
+            box-shadow: 0 4px 20px rgba(255,45,149,0.3);
+            transform: translateY(-2px);
         }
 
-        .btn-delete-all:hover {
-            background: #ff5252;
-        }
-
+        /* ============ TABLE ============ */
         .table-wrapper {
             overflow-x: auto;
             max-height: 55vh;
             overflow-y: auto;
-            border-radius: 8px;
-            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255,255,255,0.03);
         }
 
-        .table-wrapper::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        .table-wrapper::-webkit-scrollbar-track {
-            background: var(--bg);
-        }
-
+        .table-wrapper::-webkit-scrollbar { width: 4px; height: 4px; }
+        .table-wrapper::-webkit-scrollbar-track { background: transparent; }
         .table-wrapper::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 3px;
+            background: rgba(0,212,255,0.3);
+            border-radius: 10px;
         }
+        .table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.6); }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 900px;
+            font-size: 0.78rem;
+            min-width: 960px;
         }
 
-        table thead {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+        table thead { position: sticky; top: 0; z-index: 10; }
 
         table thead th {
-            background: var(--card);
-            color: var(--accent);
-            padding: 0.8rem 0.6rem;
+            background: var(--bg-elevated);
+            color: var(--text-faint);
+            padding: 0.75rem 0.6rem;
             text-align: left;
-            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-size: 0.75rem;
-            border-bottom: 2px solid var(--accent);
+            letter-spacing: 0.8px;
+            font-size: 0.62rem;
+            border-bottom: 2px solid rgba(0,212,255,0.3);
             white-space: nowrap;
         }
 
         table tbody tr {
-            border-bottom: 1px solid var(--border);
-            transition: background 0.2s;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            transition: all 0.3s var(--ease-out-expo);
         }
 
         table tbody tr:hover {
-            background: rgba(233, 68, 96, 0.05);
+            background: rgba(255,255,255,0.02);
         }
 
         table tbody td {
             padding: 0.65rem 0.6rem;
             vertical-align: middle;
+            color: var(--text-dim);
         }
 
+        table tbody td strong { color: var(--text-main); font-weight: 600; }
+
+        .td-action-text {
+            color: var(--text-main);
+            font-weight: 400;
+            max-width: 260px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ============ BADGES ============ */
         .badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.65rem;
+            border-radius: 50px;
+            font-size: 0.65rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+        }
+
+        .badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
         }
 
         .badge-pending {
-            background: #ffab00;
-            color: #000;
+            background: rgba(255,184,0,0.12);
+            color: var(--accent-gold);
+            border: 1px solid rgba(255,184,0,0.3);
         }
+        .badge-pending::before { background: var(--accent-gold); animation: dotPulse 1.5s ease-in-out infinite; }
+
         .badge-ongoing {
-            background: #2979ff;
-            color: white;
+            background: rgba(0,212,255,0.1);
+            color: var(--accent-1);
+            border: 1px solid rgba(0,212,255,0.25);
         }
+        .badge-ongoing::before { background: var(--accent-1); }
+
         .badge-completed {
-            background: #00c853;
-            color: #000;
+            background: rgba(0,255,136,0.1);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(0,255,136,0.25);
         }
+        .badge-completed::before { background: var(--accent-emerald); }
+
         .badge-cancelled {
-            background: #ff1744;
-            color: white;
+            background: rgba(255,45,149,0.1);
+            color: #ff6b81;
+            border: 1px solid rgba(255,45,149,0.25);
         }
+        .badge-cancelled::before { background: #ff6b81; }
 
-        .action-btns {
-            display: flex;
-            gap: 0.3rem;
-        }
+        /* ============ ROW ACTIONS ============ */
+        .row-actions { display: flex; gap: 0.3rem; }
 
-        .btn-sm {
-            padding: 0.3rem 0.6rem;
-            font-size: 0.7rem;
+        .btn-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
             border: none;
-            border-radius: 4px;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
+            font-size: 0.75rem;
+            transition: all 0.35s var(--ease-out-back);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
         }
 
-        .btn-edit {
-            background: #ffab00;
-            color: #000;
-        }
-        .btn-delete {
-            background: #ff1744;
-            color: white;
-        }
+        .btn-edit-row { color: var(--accent-gold); background: rgba(255,184,0,0.1); }
+        .btn-edit-row:hover { background: rgba(255,184,0,0.3); transform: scale(1.15); }
 
-        .no-data {
+        .btn-del-row { color: #ff6b81; background: rgba(255,107,129,0.1); }
+        .btn-del-row:hover { background: rgba(255,107,129,0.3); transform: scale(1.15); }
+
+        /* ============ EMPTY STATE ============ */
+        .empty-state {
             text-align: center;
-            padding: 3rem;
-            color: var(--text-secondary);
-            font-style: italic;
+            padding: 5rem 2rem;
+            color: var(--text-faint);
+        }
+        .empty-state .empty-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.25;
+        }
+        .empty-state p {
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
         }
 
+        /* ============ MODALS ============ */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.75);
+            inset: 0;
+            background: rgba(3,3,8,0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
-
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal {
-            background: var(--surface);
-            border: 1px solid var(--accent);
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 500px;
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border-hover);
+            border-radius: var(--radius-xl);
+            padding: 2.2rem;
+            max-width: 440px;
             width: 90%;
             text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 60px rgba(123,47,255,0.1);
+            animation: modalPop 0.4s var(--ease-out-back);
         }
 
+        @keyframes modalPop {
+            from { transform: scale(0.85) translateY(30px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .modal-icon { font-size: 3rem; margin-bottom: 0.8rem; }
         .modal h3 {
-            color: var(--accent);
-            margin-bottom: 1rem;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 0.4rem;
         }
+        .modal p { color: var(--text-dim); font-size: 0.8rem; line-height: 1.6; }
+        .modal .btn-group { justify-content: center; margin-top: 1.5rem; }
 
-        .modal .btn-group {
-            justify-content: center;
-            margin-top: 1.5rem;
+        /* ============ TOAST ============ */
+        .toast-rack {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         .toast {
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border-hover);
+            border-radius: var(--radius-md);
+            padding: 0.8rem 1.4rem;
+            font-weight: 500;
+            font-size: 0.8rem;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            animation: toastIn 0.5s var(--ease-spring), toastOut 0.4s ease 2.8s forwards;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            min-width: 280px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .toast.ok { border-left: 3px solid var(--accent-emerald); color: var(--accent-emerald); }
+        .toast.err { border-left: 3px solid #ff6b81; color: #ff6b81; }
+        .toast.warn { border-left: 3px solid var(--accent-gold); color: var(--accent-gold); }
+
+        @keyframes toastIn {
+            from { transform: translateX(150%) scale(0.9); opacity: 0; }
+            to { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        @keyframes toastOut {
+            from { transform: translateX(0) scale(1); opacity: 1; }
+            to { transform: translateX(150%) scale(0.9); opacity: 0; }
+        }
+
+        /* ============ SHANE CREATION WATERMARK ============ */
+        .shane-watermark {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: #00c853;
-            color: #000;
-            padding: 1rem 2rem;
-            border-radius: 8px;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            z-index: 50;
+            font-family: 'Orbitron', monospace;
             font-weight: 700;
-            z-index: 2000;
-            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.5s forwards;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-size: 0.55rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.06);
+            pointer-events: none;
+            user-select: none;
         }
 
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
-            to {
-                opacity: 0;
-            }
-        }
-
+        /* ============ PRINT ============ */
         @media print {
-            body {
-                background: white;
-                color: black;
-            }
-            .header,
-            .form-card,
-            .toolbar,
-            .action-btns,
-            .btn,
-            .modal-overlay,
-            .toast {
-                display: none !important;
-            }
-            .container {
-                display: block;
-                max-width: 100%;
-                padding: 0;
-            }
-            .table-card {
-                border: none;
-                box-shadow: none;
-                padding: 0;
-                background: white;
-            }
-            .table-wrapper {
-                max-height: none;
-                overflow: visible;
-                border: none;
-            }
-            table thead th {
-                background: #ddd;
-                color: black;
-                border-bottom: 2px solid black;
-            }
-            table tbody tr {
-                border-bottom: 1px solid #ccc;
-            }
-            table tbody td {
-                color: black;
-            }
-            .badge {
-                border: 1px solid black;
-                color: black !important;
-                background: #eee !important;
-            }
-            @page {
-                margin: 1cm;
-                size: landscape;
-            }
+            body { background: white; color: black; }
+            .cosmic-bg, .grid-overlay, .orb, .header, .form-card, .toolbar, .row-actions,
+            .btn-icon, .btn, .modal-overlay, .toast-rack, .shane-watermark, .search-wrap,
+            .section-label, .form-header, .form-group, .btn-group { display: none !important; }
+            .container { display: block; max-width: 100%; padding: 0; }
+            .table-card { border: none; box-shadow: none; padding: 0; background: white; backdrop-filter: none; }
+            .table-wrapper { max-height: none; overflow: visible; border: none; }
+            table thead th { background: #e0e0e0; color: black; border-bottom: 2px solid black; }
+            table tbody td { color: #333; }
+            .badge { border: 1px solid #666; color: #333 !important; background: #eee !important; }
+            @page { margin: 0.6cm; size: landscape; }
         }
     </style>
 </head>
 <body>
 
+    <!-- COSMIC ELEMENTS -->
+    <div class="cosmic-bg"></div>
+    <div class="grid-overlay"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- HEADER -->
     <div class="header">
-        <div class="title">💻 LAPTOP REPAIR RECORD SYSTEM</div>
-        <div class="stats">
-            Total Records: <span id="totalRecords">0</span>
-            | Completed: <span id="completedCount">0</span>
-            | Pending: <span id="pendingCount">0</span>
+        <div class="brand">
+            <div class="brand-logo">
+                <div class="brand-logo-inner">S</div>
+            </div>
+            <div class="brand-text">
+                <span class="brand-name">SHANE CREATION</span>
+                <span class="brand-sub">RepairLog System</span>
+            </div>
+        </div>
+        <div class="header-stats">
+            <div class="stat-pill">
+                <div class="stat-pill-dot dot-total"></div>
+                <div>
+                    <div class="stat-pill-value" id="totalRecords">0</div>
+                    <div class="stat-pill-label">Total</div>
+                </div>
+            </div>
+            <div class="stat-pill">
+                <div class="stat-pill-dot dot-done"></div>
+                <div>
+                    <div class="stat-pill-value" id="completedCount">0</div>
+                    <div class="stat-pill-label">Done</div>
+                </div>
+            </div>
+            <div class="stat-pill">
+                <div class="stat-pill-dot dot-active"></div>
+                <div>
+                    <div class="stat-pill-value" id="pendingCount">0</div>
+                    <div class="stat-pill-label">Active</div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- MAIN -->
     <div class="container">
-
+        <!-- FORM -->
         <div class="form-card" id="formCard">
-            <h2 id="formTitle">➕ NEW RECORD</h2>
+            <div class="form-header">
+                <div class="form-icon-hex hex-add" id="formIcon">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <h2 id="formTitle">New Record</h2>
+            </div>
             <form id="recordForm" autocomplete="off">
-                <input type="hidden" id="recordId" value="">
-                <input type="hidden" id="recordDate" value="">
+                <input type="hidden" id="recordId">
 
-                <div class="form-group">
-                    <label>Laptop Brand *</label>
-                    <select id="laptopBrand" required>
-                        <option value="">-- Select Brand --</option>
-                        <option value="Dell">Dell</option>
-                        <option value="HP">HP</option>
-                        <option value="Lenovo">Lenovo</option>
-                        <option value="Asus">Asus</option>
-                        <option value="Acer">Acer</option>
-                        <option value="Apple">Apple (MacBook)</option>
-                        <option value="MSI">MSI</option>
-                        <option value="Razer">Razer</option>
-                        <option value="Samsung">Samsung</option>
-                        <option value="Toshiba">Toshiba</option>
-                        <option value="Fujitsu">Fujitsu</option>
-                        <option value="Huawei">Huawei</option>
-                        <option value="Xiaomi">Xiaomi</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Laptop Model *</label>
-                    <input type="text" id="laptopModel" placeholder="e.g., Latitude 5520, ThinkPad T14" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Serial Number</label>
-                    <input type="text" id="serialNumber" placeholder="e.g., ABC123XYZ">
-                </div>
-
-                <div class="form-row">
+                <div style="margin-bottom:1.2rem;">
+                    <div class="section-label">// Device Info</div>
                     <div class="form-group">
-                        <label>RAM Used *</label>
-                        <select id="ramUsed" required>
-                            <option value="">-- Select --</option>
-                            <option value="2GB DDR3">2GB DDR3</option>
-                            <option value="4GB DDR3">4GB DDR3</option>
-                            <option value="8GB DDR3">8GB DDR3</option>
-                            <option value="2GB DDR4">2GB DDR4</option>
-                            <option value="4GB DDR4">4GB DDR4</option>
-                            <option value="8GB DDR4">8GB DDR4</option>
-                            <option value="16GB DDR4">16GB DDR4</option>
-                            <option value="32GB DDR4">32GB DDR4</option>
-                            <option value="8GB DDR5">8GB DDR5</option>
-                            <option value="16GB DDR5">16GB DDR5</option>
-                            <option value="32GB DDR5">32GB DDR5</option>
-                            <option value="64GB DDR5">64GB DDR5</option>
-                            <option value="Other">Other / Custom</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>RAM Type (if Other)</label>
-                        <input type="text" id="ramCustom" placeholder="Specify custom RAM">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Storage Used</label>
-                        <select id="storageUsed">
-                            <option value="">-- Select --</option>
-                            <option value="None">None / Original</option>
-                            <option value="128GB SSD">128GB SSD</option>
-                            <option value="256GB SSD">256GB SSD</option>
-                            <option value="512GB SSD">512GB SSD</option>
-                            <option value="1TB SSD">1TB SSD</option>
-                            <option value="2TB SSD">2TB SSD</option>
-                            <option value="500GB HDD">500GB HDD</option>
-                            <option value="1TB HDD">1TB HDD</option>
-                            <option value="2TB HDD">2TB HDD</option>
+                        <label>Laptop Brand *</label>
+                        <select id="laptopBrand" required>
+                            <option value="">Select brand...</option>
+                            <option value="Dell">Dell</option>
+                            <option value="HP">HP</option>
+                            <option value="Lenovo">Lenovo</option>
+                            <option value="Asus">Asus</option>
+                            <option value="Acer">Acer</option>
+                            <option value="Apple">Apple (MacBook)</option>
+                            <option value="MSI">MSI</option>
+                            <option value="Razer">Razer</option>
+                            <option value="Samsung">Samsung</option>
+                            <option value="Toshiba">Toshiba</option>
+                            <option value="Fujitsu">Fujitsu</option>
+                            <option value="Huawei">Huawei</option>
+                            <option value="Xiaomi">Xiaomi</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Status *</label>
-                        <select id="status" required>
-                            <option value="Pending">Pending</option>
-                            <option value="Ongoing">Ongoing</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Model *</label>
+                            <input type="text" id="laptopModel" placeholder="Latitude 5520" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Serial Number</label>
+                            <input type="text" id="serialNumber" placeholder="ABC123XYZ">
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Action Performed / Repair Description *</label>
-                    <textarea id="actionPerformed" placeholder="Describe what was done: RAM upgrade, screen replacement, keyboard repair, cleaning, OS reinstall, etc." required></textarea>
+                <div style="margin-bottom:1.2rem;">
+                    <div class="section-label">// Hardware</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>RAM Used *</label>
+                            <select id="ramUsed" required>
+                                <option value="">Select RAM...</option>
+                                <option value="2GB DDR3">2GB DDR3</option>
+                                <option value="4GB DDR3">4GB DDR3</option>
+                                <option value="8GB DDR3">8GB DDR3</option>
+                                <option value="2GB DDR4">2GB DDR4</option>
+                                <option value="4GB DDR4">4GB DDR4</option>
+                                <option value="8GB DDR4">8GB DDR4</option>
+                                <option value="16GB DDR4">16GB DDR4</option>
+                                <option value="32GB DDR4">32GB DDR4</option>
+                                <option value="8GB DDR5">8GB DDR5</option>
+                                <option value="16GB DDR5">16GB DDR5</option>
+                                <option value="32GB DDR5">32GB DDR5</option>
+                                <option value="64GB DDR5">64GB DDR5</option>
+                                <option value="Other">Other / Custom</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Custom RAM</label>
+                            <input type="text" id="ramCustom" placeholder="If other...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Storage</label>
+                            <select id="storageUsed">
+                                <option value="">Select storage...</option>
+                                <option value="None">None / Original</option>
+                                <option value="128GB SSD">128GB SSD</option>
+                                <option value="256GB SSD">256GB SSD</option>
+                                <option value="512GB SSD">512GB SSD</option>
+                                <option value="1TB SSD">1TB SSD</option>
+                                <option value="2TB SSD">2TB SSD</option>
+                                <option value="500GB HDD">500GB HDD</option>
+                                <option value="1TB HDD">1TB HDD</option>
+                                <option value="2TB HDD">2TB HDD</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status *</label>
+                            <select id="status" required>
+                                <option value="Pending">Pending</option>
+                                <option value="Ongoing">Ongoing</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Technician Name</label>
-                    <input type="text" id="technician" placeholder="e.g., Juan Dela Cruz">
-                </div>
-
-                <div class="form-group">
-                    <label>Notes / Observations</label>
-                    <textarea id="notes" placeholder="Additional notes..."></textarea>
+                <div style="margin-bottom:1.2rem;">
+                    <div class="section-label">// Repair</div>
+                    <div class="form-group">
+                        <label>Action Performed *</label>
+                        <textarea id="actionPerformed" placeholder="Describe the repair..." required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Technician</label>
+                            <input type="text" id="technician" placeholder="Juan Dela Cruz">
+                        </div>
+                        <div class="form-group">
+                            <label>Notes</label>
+                            <input type="text" id="notes" placeholder="Additional notes...">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="btn-group" id="formBtnGroup">
-                    <button type="submit" class="btn btn-add" id="btnSubmit">✅ ADD RECORD</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmit">
+                        <i class="fa-solid fa-plus-circle"></i> Add Record
+                    </button>
                 </div>
                 <div class="btn-group" id="editBtnGroup" style="display:none;">
-                    <button type="button" class="btn btn-update" id="btnUpdate">💾 UPDATE RECORD</button>
-                    <button type="button" class="btn btn-cancel" id="btnCancel">❌ CANCEL</button>
+                    <button type="button" class="btn btn-gold" id="btnUpdate">
+                        <i class="fa-solid fa-check-circle"></i> Update
+                    </button>
+                    <button type="button" class="btn btn-ghost" id="btnCancel">
+                        <i class="fa-solid fa-xmark"></i> Cancel
+                    </button>
                 </div>
             </form>
         </div>
 
+        <!-- TABLE -->
         <div class="table-card">
-            <h2>
-                📋 RECORDS LIST
+            <div class="table-top-bar">
+                <h2><i class="fa-solid fa-database"></i> Records</h2>
                 <div class="toolbar">
-                    <input type="text" id="searchInput" placeholder="🔍 Search by brand, model, serial, action...">
+                    <div class="search-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" placeholder="Search...">
+                    </div>
                     <select id="filterStatus">
                         <option value="All">All Status</option>
                         <option value="Pending">Pending</option>
@@ -674,11 +1168,17 @@
                     <select id="filterBrand">
                         <option value="All">All Brands</option>
                     </select>
-                    <button class="btn btn-export btn-sm" onclick="exportToExcel()">📥 EXCEL</button>
-                    <button class="btn btn-print btn-sm" onclick="printRecords()">🖨️ PRINT</button>
-                    <button class="btn btn-delete-all btn-sm" onclick="confirmDeleteAll()">🗑️ CLEAR ALL</button>
+                    <button class="btn-tool btn-excel" onclick="exportToExcel()">
+                        <i class="fa-solid fa-file-excel"></i> Excel
+                    </button>
+                    <button class="btn-tool btn-print" onclick="printRecords()">
+                        <i class="fa-solid fa-print"></i> Print
+                    </button>
+                    <button class="btn-tool btn-danger" onclick="confirmDeleteAll()">
+                        <i class="fa-solid fa-trash-can"></i> Clear
+                    </button>
                 </div>
-            </h2>
+            </div>
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -686,95 +1186,97 @@
                             <th>Date</th>
                             <th>Brand</th>
                             <th>Model</th>
-                            <th>Serial #</th>
-                            <th>RAM Used</th>
+                            <th>Serial</th>
+                            <th>RAM</th>
                             <th>Storage</th>
-                            <th>Action Performed</th>
-                            <th>Technician</th>
+                            <th>Action</th>
+                            <th>Tech</th>
                             <th>Status</th>
                             <th>Notes</th>
-                            <th>Actions</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr class="no-data">
-                            <td colspan="11">No records found. Add a new record using the form.</td>
+                        <tr>
+                            <td colspan="11">
+                                <div class="empty-state">
+                                    <div class="empty-icon"><i class="fa-solid fa-microchip"></i></div>
+                                    <p>NO RECORDS DETECTED<br><small style="color:var(--text-faint);">Initialize a new entry</small></p>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
     </div>
 
+    <!-- MODALS -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal">
-            <h3>⚠️ CONFIRM DELETE</h3>
-            <p>Are you sure you want to delete this record? This action cannot be undone.</p>
+            <div class="modal-icon">⚠️</div>
+            <h3>DELETE RECORD</h3>
+            <p>This action is irreversible.<br>Proceed with caution.</p>
             <div class="btn-group">
-                <button class="btn btn-delete-all" id="btnConfirmDelete">🗑️ DELETE</button>
-                <button class="btn btn-cancel" onclick="closeModal()">CANCEL</button>
+                <button class="btn btn-danger" id="btnConfirmDelete"><i class="fa-solid fa-trash"></i> Delete</button>
+                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="deleteAllModal">
         <div class="modal">
-            <h3>⚠️ DELETE ALL RECORDS</h3>
-            <p>Are you sure you want to delete <strong>ALL</strong> records? This cannot be undone.</p>
+            <div class="modal-icon">🚨</div>
+            <h3>PURGE ALL DATA</h3>
+            <p>Every record will be destroyed.<br>No recovery possible.</p>
             <div class="btn-group">
-                <button class="btn btn-delete-all" id="btnConfirmDeleteAll">🗑️ DELETE ALL</button>
-                <button class="btn btn-cancel" onclick="closeDeleteAllModal()">CANCEL</button>
+                <button class="btn btn-danger" id="btnConfirmDeleteAll"><i class="fa-solid fa-skull"></i> Purge All</button>
+                <button class="btn btn-ghost" onclick="closeDeleteAllModal()">Cancel</button>
             </div>
         </div>
     </div>
 
+    <!-- TOAST RACK -->
+    <div class="toast-rack" id="toastRack"></div>
+
+    <!-- SHANE CREATION WATERMARK -->
+    <div class="shane-watermark">SHANE CREATION ◈</div>
+
     <script>
-        const STORAGE_KEY = 'laptopRepairRecords';
+        const STORAGE_KEY = 'shane_repairlog_data';
         let records = [];
         let editingId = null;
         let deleteTargetId = null;
 
         function init() {
             const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                try {
-                    records = JSON.parse(stored);
-                } catch (e) {
-                    records = [];
-                }
-            }
+            if (stored) { try { records = JSON.parse(stored); } catch (e) { records = []; } }
             populateBrandFilter();
             renderTable();
             updateStats();
         }
 
-        function saveToStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-        }
+        function saveToStorage() { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
 
         function generateId() {
-            return 'REC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+            return 'SHN-' + Date.now().toString(36).toUpperCase() + '-' +
+                Math.random().toString(36).substring(2, 5).toUpperCase();
         }
 
         function getCurrentDate() {
-            const now = new Date();
-            const yyyy = now.getFullYear();
-            const mm = String(now.getMonth() + 1).padStart(2, '0');
-            const dd = String(now.getDate()).padStart(2, '0');
-            const hh = String(now.getHours()).padStart(2, '0');
-            const min = String(now.getMinutes()).padStart(2, '0');
-            return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+            return new Intl.DateTimeFormat('en-PH', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', hour12: false
+            }).format(new Date()).replace(',', '');
         }
 
         document.getElementById('recordForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
             const ramSelected = document.getElementById('ramUsed').value;
             const ramCustom = document.getElementById('ramCustom').value.trim();
-            const finalRam = ramSelected === 'Other' ? ramCustom : ramSelected;
+            const finalRam = ramSelected === 'Other' ? (ramCustom || 'Other') : ramSelected;
 
-            const record = {
+            records.unshift({
                 id: generateId(),
                 date: getCurrentDate(),
                 brand: document.getElementById('laptopBrand').value,
@@ -786,14 +1288,12 @@
                 technician: document.getElementById('technician').value.trim(),
                 status: document.getElementById('status').value,
                 notes: document.getElementById('notes').value.trim()
-            };
-
-            records.unshift(record);
+            });
             saveToStorage();
             resetForm();
             renderTable();
             updateStats();
-            showToast('✅ Record added successfully!');
+            showToast('ok', 'Record added successfully');
         });
 
         function renderTable() {
@@ -803,82 +1303,73 @@
             const filterBrand = document.getElementById('filterBrand').value;
 
             let filtered = records.filter(r => {
-                const matchSearch = !searchTerm ||
-                    r.brand.toLowerCase().includes(searchTerm) ||
-                    r.model.toLowerCase().includes(searchTerm) ||
-                    r.serial.toLowerCase().includes(searchTerm) ||
-                    r.action.toLowerCase().includes(searchTerm) ||
-                    r.technician.toLowerCase().includes(searchTerm) ||
-                    r.ram.toLowerCase().includes(searchTerm) ||
-                    r.notes.toLowerCase().includes(searchTerm);
+                const matchSearch = !searchTerm || Object.values(r).some(v =>
+                    String(v).toLowerCase().includes(searchTerm));
                 const matchStatus = filterStatus === 'All' || r.status === filterStatus;
                 const matchBrand = filterBrand === 'All' || r.brand === filterBrand;
                 return matchSearch && matchStatus && matchBrand;
             });
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr class="no-data"><td colspan="11">No records found.</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state">
+                    <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
+                    <p>${records.length === 0 ? 'NO RECORDS DETECTED' : 'NO MATCHING RECORDS'}<br>
+                    <small style="color:var(--text-faint);">${records.length === 0 ? 'Initialize a new entry' : 'Adjust filters'}</small></p>
+                </div></td></tr>`;
                 return;
             }
 
             tbody.innerHTML = filtered.map(r => {
-                const statusClass = `badge-${r.status.toLowerCase()}`;
-                return `
-                    <tr>
-                        <td>${escapeHtml(r.date)}</td>
-                        <td><strong>${escapeHtml(r.brand)}</strong></td>
-                        <td>${escapeHtml(r.model)}</td>
-                        <td>${escapeHtml(r.serial) || '-'}</td>
-                        <td>${escapeHtml(r.ram)}</td>
-                        <td>${escapeHtml(r.storage)}</td>
-                        <td>${escapeHtml(r.action)}</td>
-                        <td>${escapeHtml(r.technician) || '-'}</td>
-                        <td><span class="badge ${statusClass}">${r.status}</span></td>
-                        <td>${escapeHtml(r.notes) || '-'}</td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn-sm btn-edit" onclick="editRecord('${r.id}')" title="Edit">✏️</button>
-                                <button class="btn-sm btn-delete" onclick="confirmDelete('${r.id}')" title="Delete">🗑️</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+                const sc = `badge-${r.status.toLowerCase()}`;
+                return `<tr>
+                    <td>${esc(r.date)}</td>
+                    <td><strong>${esc(r.brand)}</strong></td>
+                    <td>${esc(r.model)}</td>
+                    <td>${esc(r.serial) || '—'}</td>
+                    <td>${esc(r.ram)}</td>
+                    <td>${esc(r.storage)}</td>
+                    <td class="td-action-text" title="${esc(r.action)}">${esc(r.action)}</td>
+                    <td>${esc(r.technician) || '—'}</td>
+                    <td><span class="badge ${sc}">${r.status}</span></td>
+                    <td>${esc(r.notes) || '—'}</td>
+                    <td><div class="row-actions">
+                        <button class="btn-icon btn-edit-row" onclick="editRecord('${r.id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-icon btn-del-row" onclick="confirmDelete('${r.id}')"><i class="fa-solid fa-trash-can"></i></button>
+                    </div></td>
+                </tr>`;
             }).join('');
         }
 
-        function escapeHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
+        function esc(s) { const d = document.createElement('div');
+            d.textContent = s; return d.innerHTML; }
 
         function editRecord(id) {
-            const record = records.find(r => r.id === id);
-            if (!record) return;
-
+            const r = records.find(x => x.id === id);
+            if (!r) return;
             editingId = id;
             document.getElementById('recordId').value = id;
-            document.getElementById('laptopBrand').value = record.brand;
-            document.getElementById('laptopModel').value = record.model;
-            document.getElementById('serialNumber').value = record.serial;
-            document.getElementById('actionPerformed').value = record.action;
-            document.getElementById('technician').value = record.technician;
-            document.getElementById('status').value = record.status;
-            document.getElementById('notes').value = record.notes;
-            document.getElementById('storageUsed').value = record.storage;
+            document.getElementById('laptopBrand').value = r.brand;
+            document.getElementById('laptopModel').value = r.model;
+            document.getElementById('serialNumber').value = r.serial;
+            document.getElementById('actionPerformed').value = r.action;
+            document.getElementById('technician').value = r.technician;
+            document.getElementById('status').value = r.status;
+            document.getElementById('notes').value = r.notes;
+            document.getElementById('storageUsed').value = r.storage;
 
-            const commonRams = ['2GB DDR3', '4GB DDR3', '8GB DDR3', '2GB DDR4', '4GB DDR4', '8GB DDR4', '16GB DDR4',
-                '32GB DDR4', '8GB DDR5', '16GB DDR5', '32GB DDR5', '64GB DDR5'
-            ];
-            if (commonRams.includes(record.ram)) {
-                document.getElementById('ramUsed').value = record.ram;
+            const cr = ['2GB DDR3','4GB DDR3','8GB DDR3','2GB DDR4','4GB DDR4','8GB DDR4','16GB DDR4',
+                '32GB DDR4','8GB DDR5','16GB DDR5','32GB DDR5','64GB DDR5'];
+            if (cr.includes(r.ram)) {
+                document.getElementById('ramUsed').value = r.ram;
                 document.getElementById('ramCustom').value = '';
             } else {
                 document.getElementById('ramUsed').value = 'Other';
-                document.getElementById('ramCustom').value = record.ram;
+                document.getElementById('ramCustom').value = r.ram;
             }
 
-            document.getElementById('formTitle').textContent = '✏️ EDIT RECORD';
+            document.getElementById('formTitle').textContent = 'Edit Record';
+            document.getElementById('formIcon').className = 'form-icon-hex hex-edit';
+            document.getElementById('formIcon').innerHTML = '<i class="fa-solid fa-pen-to-square"></i>';
             document.getElementById('btnSubmit').style.display = 'none';
             document.getElementById('editBtnGroup').style.display = 'flex';
             document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
@@ -886,29 +1377,24 @@
 
         document.getElementById('btnUpdate').addEventListener('click', function() {
             if (!editingId) return;
-
-            const record = records.find(r => r.id === editingId);
-            if (!record) return;
-
-            const ramSelected = document.getElementById('ramUsed').value;
-            const ramCustom = document.getElementById('ramCustom').value.trim();
-            const finalRam = ramSelected === 'Other' ? ramCustom : ramSelected;
-
-            record.brand = document.getElementById('laptopBrand').value;
-            record.model = document.getElementById('laptopModel').value.trim();
-            record.serial = document.getElementById('serialNumber').value.trim();
-            record.ram = finalRam;
-            record.storage = document.getElementById('storageUsed').value || 'None';
-            record.action = document.getElementById('actionPerformed').value.trim();
-            record.technician = document.getElementById('technician').value.trim();
-            record.status = document.getElementById('status').value;
-            record.notes = document.getElementById('notes').value.trim();
-
+            const r = records.find(x => x.id === editingId);
+            if (!r) return;
+            const rs = document.getElementById('ramUsed').value;
+            const rc = document.getElementById('ramCustom').value.trim();
+            r.brand = document.getElementById('laptopBrand').value;
+            r.model = document.getElementById('laptopModel').value.trim();
+            r.serial = document.getElementById('serialNumber').value.trim();
+            r.ram = rs === 'Other' ? (rc || 'Other') : rs;
+            r.storage = document.getElementById('storageUsed').value || 'None';
+            r.action = document.getElementById('actionPerformed').value.trim();
+            r.technician = document.getElementById('technician').value.trim();
+            r.status = document.getElementById('status').value;
+            r.notes = document.getElementById('notes').value.trim();
             saveToStorage();
             resetForm();
             renderTable();
             updateStats();
-            showToast('✅ Record updated successfully!');
+            showToast('ok', 'Record updated');
         });
 
         document.getElementById('btnCancel').addEventListener('click', resetForm);
@@ -918,7 +1404,9 @@
             document.getElementById('recordId').value = '';
             document.getElementById('recordForm').reset();
             document.getElementById('ramCustom').value = '';
-            document.getElementById('formTitle').textContent = '➕ NEW RECORD';
+            document.getElementById('formTitle').textContent = 'New Record';
+            document.getElementById('formIcon').className = 'form-icon-hex hex-add';
+            document.getElementById('formIcon').innerHTML = '<i class="fa-solid fa-plus"></i>';
             document.getElementById('btnSubmit').style.display = 'block';
             document.getElementById('editBtnGroup').style.display = 'none';
         }
@@ -927,7 +1415,6 @@
             deleteTargetId = id;
             document.getElementById('deleteModal').classList.add('active');
         }
-
         document.getElementById('btnConfirmDelete').addEventListener('click', function() {
             if (deleteTargetId) {
                 records = records.filter(r => r.id !== deleteTargetId);
@@ -935,57 +1422,44 @@
                 resetForm();
                 renderTable();
                 updateStats();
-                showToast('🗑️ Record deleted.');
+                showToast('ok', 'Record deleted');
                 deleteTargetId = null;
             }
             closeModal();
         });
 
-        function closeModal() {
-            document.getElementById('deleteModal').classList.remove('active');
-            deleteTargetId = null;
-        }
+        function closeModal() { document.getElementById('deleteModal').classList.remove('active');
+            deleteTargetId = null; }
 
         function confirmDeleteAll() {
-            if (records.length === 0) {
-                showToast('⚠️ No records to delete.');
-                return;
-            }
+            if (!records.length) { showToast('warn', 'Nothing to clear'); return; }
             document.getElementById('deleteAllModal').classList.add('active');
         }
-
         document.getElementById('btnConfirmDeleteAll').addEventListener('click', function() {
             records = [];
             saveToStorage();
             resetForm();
             renderTable();
             updateStats();
-            showToast('🗑️ All records deleted.');
+            showToast('ok', 'All records purged');
             closeDeleteAllModal();
         });
 
-        function closeDeleteAllModal() {
-            document.getElementById('deleteAllModal').classList.remove('active');
-        }
-
-        document.getElementById('deleteModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
-        document.getElementById('deleteAllModal').addEventListener('click', function(e) {
-            if (e.target === this) closeDeleteAllModal();
-        });
+        function closeDeleteAllModal() { document.getElementById('deleteAllModal').classList.remove('active'); }
+        document.getElementById('deleteModal').addEventListener('click', function(e) { if (e.target === this)
+                closeModal(); });
+        document.getElementById('deleteAllModal').addEventListener('click', function(e) { if (e.target === this)
+                closeDeleteAllModal(); });
 
         document.getElementById('searchInput').addEventListener('input', renderTable);
         document.getElementById('filterStatus').addEventListener('change', renderTable);
         document.getElementById('filterBrand').addEventListener('change', renderTable);
 
         function populateBrandFilter() {
-            const filterBrand = document.getElementById('filterBrand');
+            const fb = document.getElementById('filterBrand');
             const brands = [...new Set(records.map(r => r.brand))].sort();
-            filterBrand.innerHTML = '<option value="All">All Brands</option>';
-            brands.forEach(b => {
-                filterBrand.innerHTML += `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`;
-            });
+            fb.innerHTML = '<option value="All">All Brands</option>';
+            brands.forEach(b => { fb.innerHTML += `<option value="${esc(b)}">${esc(b)}</option>`; });
         }
 
         function updateStats() {
@@ -996,70 +1470,34 @@
         }
 
         function exportToExcel() {
-            if (records.length === 0) {
-                showToast('⚠️ No records to export.');
-                return;
-            }
-
+            if (!records.length) { showToast('warn', 'No data to export'); return; }
             const data = records.map(r => ({
-                'Date': r.date,
-                'Brand': r.brand,
-                'Model': r.model,
-                'Serial Number': r.serial || '-',
-                'RAM Used': r.ram,
-                'Storage Used': r.storage || 'None',
-                'Action Performed': r.action,
-                'Technician': r.technician || '-',
-                'Status': r.status,
-                'Notes': r.notes || '-'
+                'Date': r.date, 'Brand': r.brand, 'Model': r.model, 'Serial': r.serial || '-',
+                'RAM': r.ram, 'Storage': r.storage || 'None', 'Action': r.action,
+                'Technician': r.technician || '-', 'Status': r.status, 'Notes': r.notes || '-'
             }));
-
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.json_to_sheet(data);
-
-            const colWidths = [
-                { wch: 18 },
-                { wch: 12 },
-                { wch: 20 },
-                { wch: 18 },
-                { wch: 14 },
-                { wch: 14 },
-                { wch: 40 },
-                { wch: 18 },
-                { wch: 12 },
-                { wch: 25 }
-            ];
-            ws['!cols'] = colWidths;
-
-            XLSX.utils.book_append_sheet(wb, ws, 'Laptop Repair Records');
-
-            const dateStr = new Date().toISOString().slice(0, 10);
-            const filename = `Laptop_Repair_Records_${dateStr}.xlsx`;
-
-            XLSX.writeFile(wb, filename);
-            showToast('📥 Excel file exported: ' + filename);
+            ws['!cols'] = [{ wch: 18 },{ wch: 12 },{ wch: 20 },{ wch: 16 },{ wch: 13 },{ wch: 13 },{ wch: 40 },{ wch: 16 },{ wch: 11 },{ wch: 22 }];
+            XLSX.utils.book_append_sheet(wb, ws, 'Shane_RepairLog');
+            const fn = `ShaneCreation_RepairLog_${new Date().toISOString().slice(0,10)}.xlsx`;
+            XLSX.writeFile(wb, fn);
+            showToast('ok', 'Exported: ' + fn);
         }
 
         function printRecords() {
-            if (records.length === 0) {
-                showToast('⚠️ No records to print.');
-                return;
-            }
+            if (!records.length) { showToast('warn', 'Nothing to print'); return; }
             window.print();
         }
 
-        function showToast(message) {
-            const existing = document.querySelector('.toast');
-            if (existing) existing.remove();
-
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                if (toast.parentNode) toast.remove();
-            }, 3000);
+        function showToast(type, msg) {
+            const rack = document.getElementById('toastRack');
+            const icons = { ok: 'fa-circle-check', err: 'fa-circle-xmark', warn: 'fa-triangle-exclamation' };
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<i class="fa-solid ${icons[type]}"></i> ${msg}`;
+            rack.appendChild(t);
+            setTimeout(() => { if (t.parentNode) t.remove(); }, 3300);
         }
 
         document.addEventListener('keydown', function(e) {
@@ -1067,10 +1505,12 @@
                 e.preventDefault();
                 document.getElementById('recordForm').dispatchEvent(new Event('submit'));
             }
+            if (e.key === 'Escape') { closeModal();
+                closeDeleteAllModal();
+                resetForm(); }
         });
 
         init();
     </script>
-
 </body>
 </html>
