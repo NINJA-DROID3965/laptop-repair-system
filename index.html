@@ -182,6 +182,7 @@
         .btn-gold:hover { transform:translateY(-2px); box-shadow:0 6px 20px var(--glow-gold); }
         .btn-danger { background:rgba(255,71,87,0.8); color:#fff; }
         .btn-danger:hover { background:#ff4757; transform:translateY(-2px); }
+        .btn-ghost { background:rgba(255,255,255,0.03); color:var(--text-dim); border:1px solid rgba(255,255,255,0.08); }
         .btn-excel { background:rgba(0,255,136,0.15); color:var(--accent-emerald); border:1px solid rgba(0,255,136,0.3); }
         .btn-excel:hover { background:rgba(0,255,136,0.25); transform:translateY(-2px); }
         .btn-sync { background:rgba(0,212,255,0.1); color:var(--accent-1); border:1px solid rgba(0,212,255,0.25); }
@@ -309,7 +310,6 @@
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
 
-<!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
     <div class="login-box">
         <h2>🔐 SHANE CREATION</h2>
@@ -321,7 +321,6 @@
     </div>
 </div>
 
-<!-- HEADER -->
 <div class="header">
     <div class="brand">
         <div class="brand-logo"><div class="brand-logo-inner">S</div></div>
@@ -333,18 +332,13 @@
     </div>
 </div>
 
-<!-- MAIN -->
 <div class="container" id="mainContent" style="display:none;">
-
-    <!-- STATS -->
     <div class="stats-row" id="statsRow">
         <div class="stat-card"><div><div class="val cyan" id="statTotal">0</div><div class="lbl">Total Records</div></div></div>
         <div class="stat-card"><div><div class="val green" id="statDone">0</div><div class="lbl">Completed</div></div></div>
         <div class="stat-card"><div><div class="val gold" id="statPending">0</div><div class="lbl">Pending</div></div></div>
         <div class="stat-card"><div><div class="val pink" id="statTechs">0</div><div class="lbl">Technicians</div></div></div>
     </div>
-
-    <!-- TABS -->
     <div class="tabs" id="tabsBar">
         <button class="tab-btn active" onclick="switchTab('records')">📋 Records</button>
         <button class="tab-btn" onclick="switchTab('add')">➕ Add Record</button>
@@ -352,7 +346,6 @@
         <button class="tab-btn" id="tabAddAccount" onclick="switchTab('addAccount')" style="display:none;">➕ Add Tech</button>
     </div>
 
-    <!-- TAB: Records List -->
     <div class="tab-content active" id="tab-records">
         <div class="card">
             <h3><i class="fa-solid fa-list"></i> All Repair Records</h3>
@@ -370,7 +363,6 @@
         </div>
     </div>
 
-    <!-- TAB: Add Record -->
     <div class="tab-content" id="tab-add">
         <div class="card">
             <h3><i class="fa-solid fa-plus-circle"></i> <span id="formTitle">New Repair Record</span></h3>
@@ -382,7 +374,7 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>Serial</label><input type="text" id="serialNumber" placeholder="Serial number"></div>
-                    <div class="form-group"><label>Technician</label><input type="text" id="technicianField" placeholder="Tech name" id="technicianField"></div>
+                    <div class="form-group"><label>Technician</label><input type="text" id="technicianField" placeholder="Tech name"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>RAM *</label><select id="ramUsed" required><option value="">Select...</option><option value="2GB DDR3">2GB DDR3</option><option value="4GB DDR3">4GB DDR3</option><option value="8GB DDR3">8GB DDR3</option><option value="4GB DDR4">4GB DDR4</option><option value="8GB DDR4">8GB DDR4</option><option value="16GB DDR4">16GB DDR4</option><option value="32GB DDR4">32GB DDR4</option><option value="8GB DDR5">8GB DDR5</option><option value="16GB DDR5">16GB DDR5</option><option value="32GB DDR5">32GB DDR5</option><option value="Other">Other</option></select></div>
@@ -402,7 +394,6 @@
         </div>
     </div>
 
-    <!-- TAB: Accounts List (ADMIN ONLY) -->
     <div class="tab-content" id="tab-accounts">
         <div class="card">
             <h3><i class="fa-solid fa-users"></i> Technician Accounts</h3>
@@ -413,7 +404,6 @@
         </div>
     </div>
 
-    <!-- TAB: Add Account (ADMIN ONLY) -->
     <div class="tab-content" id="tab-addAccount">
         <div class="card">
             <h3><i class="fa-solid fa-user-plus"></i> Create Tech Account</h3>
@@ -426,7 +416,6 @@
     </div>
 </div>
 
-<!-- MODALS -->
 <div class="modal-overlay" id="deleteModal"><div class="modal"><h3>⚠️ Delete Record</h3><p>This will be permanently removed.</p><div class="btn-group"><button class="btn btn-danger" id="btnConfirmDelete">Delete</button><button class="btn btn-ghost" onclick="closeModal()">Cancel</button></div></div></div>
 <div class="modal-overlay" id="deleteAccountModal"><div class="modal"><h3>⚠️ Delete Account</h3><p>Remove this technician account?</p><div class="btn-group"><button class="btn btn-danger" id="btnConfirmDelAccount">Delete</button><button class="btn btn-ghost" onclick="closeDelAccModal()">Cancel</button></div></div></div>
 
@@ -434,14 +423,13 @@
 <div class="shane-watermark">SHANE CREATION ◈ ADMIN SYSTEM</div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbxpKv6uyvkpYSY_nXYp-yuaQfoYLc4DUWDBWVJXCHRfzo4_nuNAqJGyCw0DjkEC62OZHQ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxaWZ1Wzi_cphOfstW2HxYEDiNt3NLheyh2u0RiXTz9n7OoLQyREB49kRW2f7XwOBC2JA/exec';
 let currentUser = null;
 let records = [];
 let accounts = [];
 let editingId = null, editingRow = null, deleteTargetId = null, deleteTargetRow = null;
 let delAccRow = null;
 
-// ========== LOGIN ==========
 async function doLogin() {
     const u = document.getElementById('loginUsername').value.trim();
     const p = document.getElementById('loginPassword').value.trim();
@@ -462,7 +450,8 @@ async function doLogin() {
             }
             document.getElementById('technicianField').value = data.username;
             await loadAll();
-            showToast('ok','Welcome, '+data.username+'!');
+            switchTab('records');
+            showToast('ok','Welcome, '+data.username+'! '+records.length+' records loaded');
         } else {
             document.getElementById('loginError').textContent = data.error||'Invalid login';
         }
@@ -474,25 +463,21 @@ function logout(){
     currentUser=null; records=[]; accounts=[];
     document.getElementById('loginOverlay').classList.remove('hidden');
     document.getElementById('mainContent').style.display='none';
-    document.getElementById('loginUsername').value='';
-    document.getElementById('loginPassword').value='';
+    document.getElementById('loginUsername').value=''; document.getElementById('loginPassword').value='';
     document.getElementById('loginError').textContent='';
-    document.getElementById('tabAccounts').style.display='none';
-    document.getElementById('tabAddAccount').style.display='none';
+    document.getElementById('tabAccounts').style.display='none'; document.getElementById('tabAddAccount').style.display='none';
 }
 
-// ========== API ==========
 async function apiCall(params){
-    try{
-        const qs = new URLSearchParams(params).toString();
-        const res = await fetch(API_URL+'?'+qs);
-        return await res.json();
-    }catch(e){ console.error(e); return null; }
+    try{ const qs = new URLSearchParams(params).toString(); const res = await fetch(API_URL+'?'+qs); return await res.json(); }
+    catch(e){ console.error(e); return null; }
 }
 
 async function loadAll(){
-    await Promise.all([fetchRecords(), fetchAccounts()]);
+    await fetchRecords();
+    await fetchAccounts();
     updateStats();
+    renderRecords();
 }
 async function fetchRecords(){
     try{
@@ -501,7 +486,8 @@ async function fetchRecords(){
         if(Array.isArray(data)) records = data;
         renderRecords();
         populateTechFilter();
-    }catch(e){}
+        updateStats();
+    }catch(e){ console.error('fetchRecords error:',e); }
 }
 async function fetchAccounts(){
     if(currentUser&&currentUser.role!=='admin') return;
@@ -513,7 +499,6 @@ async function fetchAccounts(){
     }catch(e){}
 }
 
-// ========== RECORDS TABLE ==========
 function renderRecords(){
     const tbody = document.getElementById('tableBody');
     const st = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -551,7 +536,6 @@ document.getElementById('searchInput').addEventListener('input',renderRecords);
 document.getElementById('filterStatus').addEventListener('change',renderRecords);
 document.getElementById('filterTech').addEventListener('change',renderRecords);
 
-// ========== ADD / EDIT RECORD ==========
 document.getElementById('recordForm').addEventListener('submit',async function(e){
     e.preventDefault();
     const r = {
@@ -574,7 +558,6 @@ document.getElementById('recordForm').addEventListener('submit',async function(e
     }
     resetForm();
     await fetchRecords();
-    updateStats();
     switchTab('records');
     showToast('ok','Record saved!');
 });
@@ -599,38 +582,32 @@ function editRecord(id,ri){
     document.getElementById('editBtns').style.display='flex';
     switchTab('add');
 }
-document.getElementById('btnUpdate').addEventListener('click',async function(){
-    document.getElementById('recordForm').dispatchEvent(new Event('submit'));
-});
+document.getElementById('btnUpdate').addEventListener('click',function(){ document.getElementById('recordForm').dispatchEvent(new Event('submit')); });
 document.getElementById('btnCancel').addEventListener('click',resetForm);
 function resetForm(){
     editingId=null; editingRow=null;
     document.getElementById('recordId').value=''; document.getElementById('recordRow').value='';
     document.getElementById('recordForm').reset();
-    document.getElementById('technicianField').value=currentUser.username;
+    document.getElementById('technicianField').value=currentUser?currentUser.username:'';
     document.getElementById('formTitle').textContent='New Repair Record';
     document.getElementById('btnSubmit').style.display='block';
     document.getElementById('editBtns').style.display='none';
 }
 
-// ========== DELETE RECORD ==========
 function confirmDelete(id,ri){ deleteTargetId=id; deleteTargetRow=ri; document.getElementById('deleteModal').classList.add('active'); }
 document.getElementById('btnConfirmDelete').addEventListener('click',async function(){
     if(deleteTargetRow){
         await apiCall({action:'delete',row:deleteTargetRow,technician:currentUser.username,role:currentUser.role});
-        await fetchRecords(); updateStats(); resetForm(); showToast('ok','Deleted');
+        await fetchRecords(); resetForm(); showToast('ok','Deleted');
     }
     closeModal();
 });
 function closeModal(){ document.getElementById('deleteModal').classList.remove('active'); deleteTargetId=null; deleteTargetRow=null; }
 document.getElementById('deleteModal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
 
-// ========== ACCOUNTS ==========
 function renderAccounts(){
     const tbody = document.getElementById('accountsBody');
-    if(accounts.length===0){
-        tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><p>No accounts</p></div></td></tr>'; return;
-    }
+    if(accounts.length===0){ tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><p>No accounts</p></div></td></tr>'; return; }
     tbody.innerHTML = accounts.map(a=>{
         const delBtn = (a.username!=='Shxne_Chael') ? '<button class="btn-icon btn-del-row" onclick="confirmDelAccount('+a.rowIndex+')"><i class="fa-solid fa-trash"></i></button>' : '<button class="btn-icon btn-locked"><i class="fa-solid fa-shield-halved"></i></button>';
         return '<tr><td><strong>'+esc(a.username)+'</strong></td><td>'+esc(a.password)+'</td><td><span class="badge '+(a.role==='admin'?'badge-ongoing':'badge-completed')+'">'+esc(a.role)+'</span></td><td>'+delBtn+'</td></tr>';
@@ -652,7 +629,6 @@ document.getElementById('btnConfirmDelAccount').addEventListener('click',async f
 function closeDelAccModal(){ document.getElementById('deleteAccountModal').classList.remove('active'); delAccRow=null; }
 document.getElementById('deleteAccountModal').addEventListener('click',function(e){ if(e.target===this) closeDelAccModal(); });
 
-// ========== STATS ==========
 function updateStats(){
     document.getElementById('statTotal').textContent = records.length;
     document.getElementById('statDone').textContent = records.filter(r=>r.status==='Completed').length;
@@ -660,16 +636,15 @@ function updateStats(){
     document.getElementById('statTechs').textContent = accounts.length;
 }
 
-// ========== TABS ==========
 function switchTab(name){
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
     document.getElementById('tab-'+name).classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(b=>{ if(b.textContent.toLowerCase().includes(name.replace('add','Add').replace('accounts','Accounts').replace('records','Records'))) b.classList.add('active'); });
-    if(name==='records'){ fetchRecords(); updateStats(); }
+    event.target.classList.add('active');
+    if(name==='records'){ fetchRecords(); }
     if(name==='accounts') fetchAccounts();
 }
-async function syncNow(){ await fetchRecords(); updateStats(); showToast('ok','Synced!'); }
+async function syncNow(){ await fetchRecords(); showToast('ok','Synced! '+records.length+' records'); }
 function exportToExcel(){
     if(!records.length){ showToast('warn','No data'); return; }
     const data = records.map(r=>({'Date':r.date||'','Brand':r.brand||'','Model':r.model||'','Serial':r.serial||'-','RAM':r.ram||'','Storage':r.storage||'None','Action':r.action||'','Technician':r.technician||'-','Status':r.status||'','Notes':r.notes||'-'}));
